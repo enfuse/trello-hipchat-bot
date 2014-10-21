@@ -44,7 +44,7 @@ class Bot
             card_link = "#{board_link} : <a href='https://trello.com/card/#{action.data['board']['id']}/#{action.data['card']['idShort']}'>#{action.data['card']['name']}</a>"
             message = case action.type.to_sym
             when :updateCard
-              color = :red
+     
               if action.data['listBefore']
                 "#{action.member_creator.full_name} ha movido #{card_link} de #{action.data['listBefore']['name']} a #{action.data['listAfter']['name']}"
               elsif action.data['card']['closed'] && !action.data['old']['closed']
@@ -84,6 +84,26 @@ class Bot
               STDERR.puts action.inspect
               ""
             end
+
+            color = case action.type.to_sym
+            when :updateCard
+              :red
+            when :createCard            
+              :red
+            when :moveCardToBoard              
+              :green
+            when :updateCheckItemStateOnCard              
+              :purple
+            when :commentCard            
+              :gray
+            when :deleteCard
+              :red
+             when :addChecklistToCard              
+              :red
+             when :removeChecklistFromCard               
+              :red
+            end
+
 
             if dedupe.new? message
               puts "Sending: #{message}"
