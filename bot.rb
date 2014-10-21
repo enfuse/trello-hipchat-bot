@@ -34,6 +34,7 @@ class Bot
       puts "Querying Trello at #{Time.now.to_s}"
       boards.each do |board_with_room|
         board = board_with_room.first
+        color = :yellow
         hipchat_room = hipchat[board_with_room.last]
         last_timestamp = timestamps[board.id]
         actions = board.actions(:filter => :all, :since => last_timestamp.iso8601)
@@ -43,6 +44,7 @@ class Bot
             card_link = "#{board_link} : <a href='https://trello.com/card/#{action.data['board']['id']}/#{action.data['card']['idShort']}'>#{action.data['card']['name']}</a>"
             message = case action.type.to_sym
             when :updateCard
+              color = :red
               if action.data['listBefore']
                 "#{action.member_creator.full_name} ha movido #{card_link} de #{action.data['listBefore']['name']} a #{action.data['listAfter']['name']}"
               elsif action.data['card']['closed'] && !action.data['old']['closed']
@@ -55,29 +57,29 @@ class Bot
 
             when :createCard
               "#{action.member_creator.full_name} ha añadido #{card_link} a #{action.data['list']['name']}"
-
+              color = :red
             when :moveCardToBoard
               "#{action.member_creator.full_name} ha movido #{card_link} de #{action.data['boardSource']['name']} a #{action.data['board']['name']}"
-
+              color = :green
             when :updateCheckItemStateOnCard
               if action.data["checkItem"]["state"] == 'complete'
                 "#{action.member_creator.full_name} checkeado \"#{ action.data['checkItem']['name']}\" en #{card_link}"
               else
                 "#{action.member_creator.full_name} descheckeado \"#{action.data['checkItem']['name']}\" en #{card_link}"
               end
-
+              color = :purple
             when :commentCard
               "#{action.member_creator.full_name} a comentado en #{card_link}: #{action.data['text']}"
-
+              color = :gray
             when :deleteCard
               "#{action.member_creator.full_name} ha borrado la tarjeta ##{action.data['card']['idShort']}"
-
+              color = :red
              when :addChecklistToCard
                "#{action.member_creator.full_name} añadió un checklist \"#{action.data['checklist']['name']}\" a #{card_link}"
-
+              color = :red
              when :removeChecklistFromCard
                "#{action.member_creator.full_name} quitó un checklist \"#{action.data['checklist']['name']}\" de #{card_link}"
-
+              color = :red
             else
               STDERR.puts action.inspect
               ""
@@ -85,7 +87,7 @@ class Bot
 
             if dedupe.new? message
               puts "Sending: #{message}"
-              hipchat_room.send('El oompabot', message, :color => :purple)
+              hipchat_room.send('Trello', message, :color => color)
             else
               puts "Supressing duplicate message: #{message}"
             end
