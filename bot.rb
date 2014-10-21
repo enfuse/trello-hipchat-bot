@@ -44,39 +44,39 @@ class Bot
             message = case action.type.to_sym
             when :updateCard
               if action.data['listBefore']
-                "#{action.member_creator.full_name} moved #{card_link} from #{action.data['listBefore']['name']} to #{action.data['listAfter']['name']}"
+                "#{action.member_creator.full_name} ha movido #{card_link} de #{action.data['listBefore']['name']} a #{action.data['listAfter']['name']}"
               elsif action.data['card']['closed'] && !action.data['old']['closed']
-                "#{action.member_creator.full_name} archived #{card_link}"
+                "#{action.member_creator.full_name} ha archivado #{card_link}"
               elsif !action.data['card']['closed'] && action.data['old']['closed']
-                "#{action.member_creator.full_name} has been put back #{card_link} to the board"
+                "#{action.member_creator.full_name} ha devuelto #{card_link} a la pila"
               elsif action.data['old']['name']
-                "#{action.member_creator.full_name} renamed \"#{action.data['old']['name']}\" to #{card_link}"
+                "#{action.member_creator.full_name} ha renombrado \"#{action.data['old']['name']}\" to #{card_link}"
               end
 
             when :createCard
-              "#{action.member_creator.full_name} added #{card_link} to #{action.data['list']['name']}"
+              "#{action.member_creator.full_name} ha añadido #{card_link} a #{action.data['list']['name']}"
 
             when :moveCardToBoard
-              "#{action.member_creator.full_name} moved #{card_link} from the #{action.data['boardSource']['name']} board to #{action.data['board']['name']}"
+              "#{action.member_creator.full_name} ha movido #{card_link} de #{action.data['boardSource']['name']} a #{action.data['board']['name']}"
 
             when :updateCheckItemStateOnCard
               if action.data["checkItem"]["state"] == 'complete'
-                "#{action.member_creator.full_name} checked off \"#{ action.data['checkItem']['name']}\" on #{card_link}"
+                "#{action.member_creator.full_name} checkeado \"#{ action.data['checkItem']['name']}\" en #{card_link}"
               else
-                "#{action.member_creator.full_name} unchecked \"#{action.data['checkItem']['name']}\" on #{card_link}"
+                "#{action.member_creator.full_name} descheckeado \"#{action.data['checkItem']['name']}\" en #{card_link}"
               end
 
             when :commentCard
-              "#{action.member_creator.full_name} commented on #{card_link}: #{action.data['text']}"
+              "#{action.member_creator.full_name} a comentado en #{card_link}: #{action.data['text']}"
 
             when :deleteCard
-              "#{action.member_creator.full_name} deleted card ##{action.data['card']['idShort']}"
+              "#{action.member_creator.full_name} ha borrado la tarjeta ##{action.data['card']['idShort']}"
 
-            # when :addChecklistToCard
-            #   "#{action.member_creator.full_name} added the checklist \"#{action.data['checklist']['name']}\" to #{card_link}"
+             when :addChecklistToCard
+               "#{action.member_creator.full_name} añadió un checklist \"#{action.data['checklist']['name']}\" a #{card_link}"
 
-            # when :removeChecklistFromCard
-            #   "#{action.member_creator.full_name} removed the checklist \"#{action.data['checklist']['name']}\" from #{card_link}"
+             when :removeChecklistFromCard
+               "#{action.member_creator.full_name} quitó un checklist \"#{action.data['checklist']['name']}\" de #{card_link}"
 
             else
               STDERR.puts action.inspect
@@ -85,7 +85,7 @@ class Bot
 
             if dedupe.new? message
               puts "Sending: #{message}"
-              hipchat_room.send('Trello', message, :color => :purple)
+              hipchat_room.send('El oompabot', message, :color => :purple)
             else
               puts "Supressing duplicate message: #{message}"
             end
