@@ -87,7 +87,15 @@ class Bot
 
             color = case action.type.to_sym
             when :updateCard
-              :red
+              if action.data['listBefore']
+                :green
+              elsif action.data['card']['closed'] && !action.data['old']['closed']
+                :purple
+              elsif !action.data['card']['closed'] && action.data['old']['closed']
+                :red
+              elsif action.data['old']['name']
+                :gray
+              end
             when :createCard            
               :red
             when :moveCardToBoard              
